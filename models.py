@@ -1,7 +1,8 @@
-from peewee import Model, CharField, DateTimeField, SqliteDatabase
+from peewee import Model, CharField, TextField, DateTimeField
+from playhouse.db_url import connect
 
-
-database = SqliteDatabase('notes.db')
+# Database connection
+database = connect('sqlite:///notes.db')
 
 class BaseModel(Model):
     class Meta:
@@ -9,9 +10,17 @@ class BaseModel(Model):
 
 class Note(BaseModel):
     title = CharField(max_length=100)
-    content = CharField(max_length=500)
-    created_at = DateTimeField(auto_now_add=True)
-    updated_at = DateTimeField(auto_now=True)
+    content = TextField()
+    created_at = DateTimeField(default=None)  
+    updated_at = DateTimeField(default=None)  
 
-    class Meta:
-        table_name = 'notes'
+    def save(self, *args, **kwargs):
+        from datetime import datetime
+        if not self.created_at:
+            self.created_at = datetime.utcnow()
+        self.updated_at = datetime.utcnow()
+        return super(Note, self).save(*args, **kwargs)
+
+# Create tables
+with database:
+    database.create_tables([Note], safe=True)
