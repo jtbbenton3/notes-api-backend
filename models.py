@@ -1,4 +1,4 @@
-from peewee import Model, CharField, TextField, DateTimeField
+from peewee import Model, CharField, TextField, DateTimeField, ForeignKeyField
 from playhouse.db_url import connect
 
 # Database connection
@@ -8,11 +8,19 @@ class BaseModel(Model):
     class Meta:
         database = database
 
+class User(BaseModel):
+    username = CharField(unique=True)
+    password = CharField()
+
+    class Meta:
+        table_name = 'users'
+
 class Note(BaseModel):
     title = CharField(max_length=100)
     content = TextField()
-    created_at = DateTimeField(default=None)  
-    updated_at = DateTimeField(default=None)  
+    created_at = DateTimeField(default=None)
+    updated_at = DateTimeField(default=None)
+    user = ForeignKeyField(User, backref='notes')
 
     def save(self, *args, **kwargs):
         from datetime import datetime
@@ -23,4 +31,4 @@ class Note(BaseModel):
 
 # Create tables
 with database:
-    database.create_tables([Note], safe=True)
+    database.create_tables([User, Note], safe=True)
