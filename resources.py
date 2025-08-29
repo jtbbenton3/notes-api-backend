@@ -1,14 +1,19 @@
 from flask import request, jsonify
 from models import Note, database
+from schemas import note_schema, NoteSchema
 
-# Create new note
+# Create a new note
 def create_note():
     data = request.get_json()
-    with database.atomic():
-        note = Note.create(title=data['title'], content=data['content'])
-    return jsonify({"id": note.id, "title": note.title, "content": note.content}), 201
+    try:
+        validated_data = NoteSchema.validate_note(data)
+        with database.atomic():
+            note = Note.create(title=validated_data['title'], content=validated_data['content'])
+        return note_schema.dump(note), 201
+    except ValidationError as err:
+        return jsonify({"error": err.messages}), 400
 
-# notes
+# List all notes
 def get_notes():
     notes = Note.select()
-    return jsonify([{"id": note.id, "title": note.title, "content": note.content, "created_at": note.created_at.isoformat()} for note in notes]), 200
+    return notes_schema.dump(notes), 200
