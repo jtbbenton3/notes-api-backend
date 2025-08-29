@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from models import database, Note, User
@@ -20,6 +20,23 @@ from resources import (
 # ensure tables exist
 with app.app_context():
     database.create_tables([User, Note], safe=True)
+
+# friendly API index at "/"
+@app.get("/")
+def index():
+    return jsonify({
+        "service": "Notes API",
+        "status": "ok",
+        "endpoints": [
+            "POST /signup",
+            "POST /login",
+            "GET  /me",
+            "GET  /notes?per_page=10&page=1",
+            "POST /notes",
+            "PATCH /notes/<id>",
+            "DELETE /notes/<id>"
+        ]
+    }), 200
 
 # register endpoints
 app.add_url_rule('/signup', view_func=signup, methods=['POST'])
