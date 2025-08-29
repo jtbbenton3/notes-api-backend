@@ -1,28 +1,32 @@
 # Notes API Backend
 
-## Project Summary
-I’m building a Flask API with JWT authentication for a Notes app. Users can register, log in, and manage their own notes with CRUD operations. The GET /notes endpoint will have pagination, and all endpoints will be protected to ensure only the owner can access their notes.
+A simple Flask + SQLite backend for a Notes app with **JWT authentication**, **bcrypt-hashed passwords**, and full **CRUD** for notes. All note routes are **protected** so each user only sees and edits their own notes. The list endpoint supports **pagination**.
 
-## Design Plan
-### Models
-- `User`: `id` (primary key), `username` (unique, String), `password_hash` (String, Bcrypt).
-- `Notes`: `id` (primary key), `title` (String, non-empty), `content` (Text), `user_id` (foreign key to `User`).
+---
 
-### Relationships
-- `User` has many `Notes`.
-- `Notes` belongs to `User`.
+## Features
+- User signup, login, and “me” (current user) endpoints
+- Passwords hashed with bcrypt (no raw passwords stored)
+- JWT auth protecting all notes routes
+- Notes CRUD (create/read/update/delete)
+- Paginated `GET /notes?page=1&per_page=10`
+- SQLite database for easy local setup
+- Seed script for quick demo data
 
-### Endpoints
-- **Auth**: 
-  - `POST /signup`
-  - `POST /login`
-  - `GET /me`
-- **Notes**: 
-  - `GET /notes` (paginated)
-  - `POST /notes`
-  - `PATCH /notes/<id>`
-  - `DELETE /notes/<id>`
+## Tech Stack
+- Python 3.8
+- Flask, flask-jwt-extended, flask-bcrypt
+- Peewee ORM (SQLite)
+- Marshmallow for request/response schemas
 
-### Schemas
-- `UserSchema`: fields `id`, `username` (validate unique `username`).
-- `NoteSchema`: fields `id`, `title`, `content`, `user_id` (validate non-empty `title`).
+---
+
+## Requirements
+- Python **3.8**
+- `pip` and `pipenv` (`pip install pipenv`)
+
+## Installation
+```bash
+pip install pipenv
+pipenv install
+pipenv shell
